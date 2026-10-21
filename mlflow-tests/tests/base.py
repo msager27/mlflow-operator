@@ -87,7 +87,10 @@ class TestBase:
     def init_clients(self, setup_clients):
         """Initialize instance attributes from session-scoped clients."""
         self.admin_client, self.k8_manager, self.user_manager, self.workspaces = setup_clients
-        self.test_context = TestContext(workspaces=self.workspaces)
+        self.test_context = TestContext(
+            workspaces=self.workspaces,
+            admin_client=self.admin_client,
+        )
 
     @pytest.fixture(autouse=True)
     def init_experiments_and_runs(self, create_experiments_and_runs):
@@ -586,6 +589,10 @@ class TestBase:
         if not hasattr(test_data, 'test_steps') or not test_data.test_steps:
             logger.debug("No test steps to execute")
             return
+
+        # Keep validators that need privileged verification in sync with the
+        # freshly authenticated admin client.
+        self.test_context.admin_client = self.admin_client
 
         # Handle both single TestStep and list of TestSteps
         test_steps = test_data.test_steps if isinstance(test_data.test_steps, list) else [test_data.test_steps]

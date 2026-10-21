@@ -27,6 +27,7 @@ class TestContext:
         active_model_name: Currently active registered model name
         models_to_delete: Map of model_name -> workspace for cleanup
         active_user: Currently active user
+        admin_client: MLflow client authenticated with administrator credentials
         user_client: MLflow client authenticated with current user credentials
         users_to_delete: List of users to delete (users are global, not workspace-scoped)
         resource_map: Shared resource map from fixtures
@@ -76,6 +77,7 @@ class TestContext:
     mcp_server_search_results: Optional[list] = None
     mcp_access_endpoint_search_results: Optional[list] = None
     active_user: Optional[UserInfo] = None
+    admin_client: Optional[MlflowClient] = None
     user_client: Optional[MlflowClient] = None
     users_to_delete: list[UserInfo] = field(default_factory=list)
     resource_map: dict[ResourceType, dict[str, dict[str, dict[str, str]]]] = field(default_factory=dict)
