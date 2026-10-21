@@ -38,6 +38,7 @@ markers = [
     "Traces: Test trace RBAC and direct trace-ingestion behavior",
     "Workspaces: Test Kubernetes workspace discovery and filtering",
     "MCPRegistry: Test MCP Server Registry RBAC and lifecycle operations",
+    "SkillRegistry: Test Skill Registry RBAC, lifecycle, and artifact operations",
     "pre_upgrade: Seed static MLflow state before an upgrade",
     "post_upgrade: Validate static MLflow state after an upgrade",
 ]
