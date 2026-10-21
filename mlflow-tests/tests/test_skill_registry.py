@@ -562,7 +562,14 @@ class TestSkillRegistry(TestBase):
         ),
     ]
 
-    if Config.SERVE_ARTIFACTS:
+    # File-backed storage requires MLflow artifact serving for local Skill
+    # registration, so deploy.py forces this setting to true when no dedicated
+    # artifact server is configured.
+    effective_serve_artifacts = Config.SERVE_ARTIFACTS or (
+        Config.ARTIFACT_STORAGE == "file" and not Config.ARTIFACTS_SERVER
+    )
+
+    if effective_serve_artifacts:
         test_scenarios.extend(
             [
                 TestData(
