@@ -26,10 +26,13 @@ from .validations import (
     validate_no_error,
     validate_skill_artifact_read,
     validate_skill_artifact_registered,
+    validate_skill_artifact_registration_unavailable,
     validate_skill_created,
+    validate_skill_deleted,
     validate_skill_retrieved,
     validate_skill_search_excludes_other_workspace,
     validate_skill_search_includes_active_skill,
+    validate_skill_updated,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,6 +44,8 @@ SCOPED_SKILL_NAME = f"scoped-skill-{uuid.uuid4().hex[:12]}"
 OTHER_GET_SKILL_NAME = f"other-get-skill-{uuid.uuid4().hex[:12]}"
 OTHER_UPDATE_SKILL_NAME = f"other-update-skill-{uuid.uuid4().hex[:12]}"
 OTHER_DELETE_SKILL_NAME = f"other-delete-skill-{uuid.uuid4().hex[:12]}"
+SCOPED_UPDATE_SKILL_NAME = f"scoped-update-skill-{uuid.uuid4().hex[:12]}"
+SCOPED_DELETE_SKILL_NAME = f"scoped-delete-skill-{uuid.uuid4().hex[:12]}"
 SEARCH_SKILL_NAME = f"search-skill-{uuid.uuid4().hex[:12]}"
 
 
@@ -427,6 +432,62 @@ class TestSkillRegistry(TestBase):
             ],
         ),
         TestData(
+            test_name="Named UPDATE permission allows the matching Skill",
+            workspace_to_use=WORKSPACE,
+            test_steps=[
+                TestStep(action_func=_seed_skill_name(SCOPED_UPDATE_SKILL_NAME)),
+                TestStep(
+                    action_func=action_create_skill,
+                    validate_func=validate_skill_created,
+                    user_info=UserInfo(
+                        workspace=WORKSPACE,
+                        verbs=[KubeVerb.CREATE],
+                        resource_types=SKILL_RESOURCE,
+                    ),
+                ),
+                TestStep(
+                    action_func=action_update_skill,
+                    validate_func=validate_no_error,
+                    user_info=UserInfo(
+                        workspace=WORKSPACE,
+                        verbs=[KubeVerb.UPDATE],
+                        resource_types=SKILL_RESOURCE,
+                        resource_names={
+                            ResourceType.SKILLS: [SCOPED_UPDATE_SKILL_NAME]
+                        },
+                    ),
+                ),
+            ],
+        ),
+        TestData(
+            test_name="Named DELETE permission allows the matching Skill",
+            workspace_to_use=WORKSPACE,
+            test_steps=[
+                TestStep(action_func=_seed_skill_name(SCOPED_DELETE_SKILL_NAME)),
+                TestStep(
+                    action_func=action_create_skill,
+                    validate_func=validate_skill_created,
+                    user_info=UserInfo(
+                        workspace=WORKSPACE,
+                        verbs=[KubeVerb.CREATE],
+                        resource_types=SKILL_RESOURCE,
+                    ),
+                ),
+                TestStep(
+                    action_func=action_delete_skill,
+                    validate_func=validate_no_error,
+                    user_info=UserInfo(
+                        workspace=WORKSPACE,
+                        verbs=[KubeVerb.DELETE],
+                        resource_types=SKILL_RESOURCE,
+                        resource_names={
+                            ResourceType.SKILLS: [SCOPED_DELETE_SKILL_NAME]
+                        },
+                    ),
+                ),
+            ],
+        ),
+        TestData(
             test_name="Named GET permission does not grant unrestricted Skill search",
             workspace_to_use=WORKSPACE,
             test_steps=[
@@ -482,6 +543,10 @@ class TestSkillRegistry(TestBase):
                     validate_func=validate_no_error,
                 ),
                 TestStep(
+                    action_func=action_get_skill,
+                    validate_func=validate_skill_updated,
+                ),
+                TestStep(
                     action_func=action_search_skills,
                     validate_func=validate_skill_search_includes_active_skill,
                 ),
@@ -489,57 +554,83 @@ class TestSkillRegistry(TestBase):
                     action_func=action_delete_skill,
                     validate_func=validate_no_error,
                 ),
-            ],
-        ),
-        TestData(
-            test_name="User with GET can read Skill artifact content",
-            workspace_to_use=WORKSPACE,
-            test_steps=[
                 TestStep(
-                    action_func=action_register_local_skill,
-                    validate_func=validate_skill_artifact_registered,
-                    user_info=UserInfo(
-                        workspace=WORKSPACE,
-                        verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
-                        resource_types=SKILL_RESOURCE,
-                    ),
-                ),
-                TestStep(
-                    action_func=action_read_skill_artifact,
-                    validate_func=validate_skill_artifact_read,
-                    user_info=UserInfo(
-                        workspace=WORKSPACE,
-                        verbs=[KubeVerb.GET],
-                        resource_types=SKILL_RESOURCE,
-                    ),
-                ),
-            ],
-        ),
-        TestData(
-            test_name="User without GET cannot read Skill artifact content",
-            workspace_to_use=WORKSPACE,
-            test_steps=[
-                TestStep(
-                    action_func=action_register_local_skill,
-                    validate_func=validate_skill_artifact_registered,
-                    user_info=UserInfo(
-                        workspace=WORKSPACE,
-                        verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
-                        resource_types=SKILL_RESOURCE,
-                    ),
-                ),
-                TestStep(
-                    action_func=action_read_skill_artifact,
-                    validate_func=validate_authentication_denied,
-                    user_info=UserInfo(
-                        workspace=WORKSPACE,
-                        verbs=[KubeVerb.LIST],
-                        resource_types=SKILL_RESOURCE,
-                    ),
+                    action_func=action_get_skill,
+                    validate_func=validate_skill_deleted,
                 ),
             ],
         ),
     ]
+
+    if Config.SERVE_ARTIFACTS:
+        test_scenarios.extend(
+            [
+                TestData(
+                    test_name="User with GET can read Skill artifact content",
+                    workspace_to_use=WORKSPACE,
+                    test_steps=[
+                        TestStep(
+                            action_func=action_register_local_skill,
+                            validate_func=validate_skill_artifact_registered,
+                            user_info=UserInfo(
+                                workspace=WORKSPACE,
+                                verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
+                                resource_types=SKILL_RESOURCE,
+                            ),
+                        ),
+                        TestStep(
+                            action_func=action_read_skill_artifact,
+                            validate_func=validate_skill_artifact_read,
+                            user_info=UserInfo(
+                                workspace=WORKSPACE,
+                                verbs=[KubeVerb.GET],
+                                resource_types=SKILL_RESOURCE,
+                            ),
+                        ),
+                    ],
+                ),
+                TestData(
+                    test_name="User without GET cannot read Skill artifact content",
+                    workspace_to_use=WORKSPACE,
+                    test_steps=[
+                        TestStep(
+                            action_func=action_register_local_skill,
+                            validate_func=validate_skill_artifact_registered,
+                            user_info=UserInfo(
+                                workspace=WORKSPACE,
+                                verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
+                                resource_types=SKILL_RESOURCE,
+                            ),
+                        ),
+                        TestStep(
+                            action_func=action_read_skill_artifact,
+                            validate_func=validate_authentication_denied,
+                            user_info=UserInfo(
+                                workspace=WORKSPACE,
+                                verbs=[KubeVerb.LIST],
+                                resource_types=SKILL_RESOURCE,
+                            ),
+                        ),
+                    ],
+                ),
+            ]
+        )
+    else:
+        test_scenarios.append(
+            TestData(
+                test_name="Local Skill registration is unavailable without artifact serving",
+                workspace_to_use=WORKSPACE,
+                test_steps=TestStep(
+                    action_func=action_register_local_skill,
+                    validate_func=validate_skill_artifact_registration_unavailable,
+                    user_info=UserInfo(
+                        workspace=WORKSPACE,
+                        verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
+                        resource_types=SKILL_RESOURCE,
+                    ),
+                ),
+            )
+        )
 
     @pytest.mark.parametrize(
         "test_data",

@@ -681,6 +681,7 @@ class TestBase:
                 "validate_authentication_denied",
                 "validate_authentication_denied_or_resource_not_found",
                 "validate_mcp_access_endpoint_deleted",
+                "validate_skill_deleted",
             }
         ):
 

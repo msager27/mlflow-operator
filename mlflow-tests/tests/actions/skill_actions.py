@@ -17,12 +17,14 @@ def _skill_name(test_context: TestContext) -> str:
 
 def action_create_skill(test_context: TestContext) -> None:
     name = _skill_name(test_context)
+    description = "MLflow Skill Registry E2E test Skill"
     skill = test_context.user_client.create_skill(
         name=name,
-        description="MLflow Skill Registry E2E test Skill",
+        description=description,
     )
     test_context.active_skill_name = skill.name
     test_context.active_skill_organization = skill.organization
+    test_context.active_skill_description = description
     test_context.add_skill_for_cleanup(
         name=skill.name,
         organization=skill.organization,
@@ -36,6 +38,7 @@ def action_get_skill(test_context: TestContext) -> None:
         organization=test_context.active_skill_organization or "",
     )
     test_context.active_skill_name = skill.name
+    test_context.active_skill_description = skill.description
 
 
 def action_search_skills(test_context: TestContext) -> None:
@@ -62,6 +65,7 @@ def action_delete_skill(test_context: TestContext) -> None:
 def action_register_local_skill(test_context: TestContext) -> None:
     """Register a local Skill directory and retain its artifact source."""
     name = _skill_name(test_context)
+    test_context.active_skill_name = name
     skill_content = "# Skill Registry E2E test Skill\n"
 
     with tempfile.TemporaryDirectory() as tmpdir:
