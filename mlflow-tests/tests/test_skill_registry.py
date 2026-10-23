@@ -9,7 +9,7 @@ import pytest
 from mlflow_tests.enums import KubeVerb, ResourceType
 
 from .actions import (
-    action_create_skill,
+    action_create_skill_shell,
     action_delete_skill,
     action_get_skill,
     action_read_skill_artifact,
@@ -61,7 +61,7 @@ def _seed_skill_name(name: str):
 class TestSkillRegistry(TestBase):
     test_scenarios: ClassVar[list[TestData]] = [
         TestData(
-            test_name="User with CREATE can create a Skill",
+            test_name="User with CREATE can create a bare Skill via the direct client API",
             user_info=UserInfo(
                 workspace=WORKSPACE,
                 verbs=[KubeVerb.CREATE],
@@ -69,20 +69,20 @@ class TestSkillRegistry(TestBase):
             ),
             workspace_to_use=WORKSPACE,
             test_steps=TestStep(
-                action_func=action_create_skill,
+                action_func=action_create_skill_shell,
                 validate_func=validate_skill_created,
             ),
         ),
         TestData(
-            test_name="User without CREATE cannot create a Skill",
+            test_name="User with UPDATE cannot create a bare Skill via the direct client API without CREATE",
             user_info=UserInfo(
                 workspace=WORKSPACE,
-                verbs=[KubeVerb.GET],
+                verbs=[KubeVerb.UPDATE],
                 resource_types=SKILL_RESOURCE,
             ),
             workspace_to_use=WORKSPACE,
             test_steps=TestStep(
-                action_func=action_create_skill,
+                action_func=action_create_skill_shell,
                 validate_func=validate_authentication_denied,
             ),
         ),
@@ -91,7 +91,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -115,7 +115,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -139,7 +139,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -176,7 +176,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -200,7 +200,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -224,7 +224,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -248,7 +248,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -272,7 +272,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     workspace_to_use=WORKSPACE,
                     user_info=UserInfo(
@@ -298,7 +298,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     workspace_to_use=WORKSPACE,
                     user_info=UserInfo(
@@ -325,7 +325,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(SCOPED_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -353,7 +353,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(OTHER_GET_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -381,7 +381,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(OTHER_UPDATE_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -409,7 +409,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(OTHER_DELETE_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -437,7 +437,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(SCOPED_UPDATE_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -465,7 +465,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(SCOPED_DELETE_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -493,7 +493,7 @@ class TestSkillRegistry(TestBase):
             test_steps=[
                 TestStep(action_func=_seed_skill_name(SEARCH_SKILL_NAME)),
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                     user_info=UserInfo(
                         workspace=WORKSPACE,
@@ -531,7 +531,7 @@ class TestSkillRegistry(TestBase):
             workspace_to_use=WORKSPACE,
             test_steps=[
                 TestStep(
-                    action_func=action_create_skill,
+                    action_func=action_create_skill_shell,
                     validate_func=validate_skill_created,
                 ),
                 TestStep(
@@ -581,7 +581,7 @@ class TestSkillRegistry(TestBase):
                             validate_func=validate_skill_artifact_registered,
                             user_info=UserInfo(
                                 workspace=WORKSPACE,
-                                verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
+                                verbs=[KubeVerb.UPDATE],
                                 resource_types=SKILL_RESOURCE,
                             ),
                         ),
@@ -605,7 +605,7 @@ class TestSkillRegistry(TestBase):
                             validate_func=validate_skill_artifact_registered,
                             user_info=UserInfo(
                                 workspace=WORKSPACE,
-                                verbs=[KubeVerb.CREATE, KubeVerb.GET, KubeVerb.UPDATE],
+                                verbs=[KubeVerb.UPDATE],
                                 resource_types=SKILL_RESOURCE,
                             ),
                         ),
@@ -619,6 +619,19 @@ class TestSkillRegistry(TestBase):
                             ),
                         ),
                     ],
+                ),
+                TestData(
+                    test_name="User with CREATE cannot register a local Skill without UPDATE",
+                    workspace_to_use=WORKSPACE,
+                    test_steps=TestStep(
+                        action_func=action_register_local_skill,
+                        validate_func=validate_authentication_denied,
+                        user_info=UserInfo(
+                            workspace=WORKSPACE,
+                            verbs=[KubeVerb.CREATE],
+                            resource_types=SKILL_RESOURCE,
+                        ),
+                    ),
                 ),
             ]
         )

@@ -29,7 +29,7 @@ from .mcp_actions import (
     action_delete_mcp_access_endpoint,
 )
 from .skill_actions import (
-    action_create_skill,
+    action_create_skill_shell,
     action_get_skill,
     action_search_skills,
     action_update_skill,
@@ -86,7 +86,7 @@ __all__ = [
     "action_search_mcp_access_endpoints",
     "action_update_mcp_access_endpoint",
     "action_delete_mcp_access_endpoint",
-    "action_create_skill",
+    "action_create_skill_shell",
     "action_get_skill",
     "action_search_skills",
     "action_update_skill",

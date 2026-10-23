@@ -15,7 +15,7 @@ def _skill_name(test_context: TestContext) -> str:
     )
 
 
-def action_create_skill(test_context: TestContext) -> None:
+def action_create_skill_shell(test_context: TestContext) -> None:
     name = _skill_name(test_context)
     description = "MLflow Skill Registry E2E test Skill"
     skill = test_context.user_client.create_skill(
