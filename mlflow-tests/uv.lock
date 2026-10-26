@@ -1430,7 +1430,7 @@ wheels = [
 [[package]]
 name = "mlflow"
 version = "3.17.0"
-source = { git = "https://github.com/opendatahub-io/mlflow.git?rev=master#49763d36349b23b7a74dfa24f24d26009b8c30a5" }
+source = { git = "https://github.com/opendatahub-io/mlflow.git?rev=49763d36349b23b7a74dfa24f24d26009b8c30a5#49763d36349b23b7a74dfa24f24d26009b8c30a5" }
 dependencies = [
     { name = "aiohttp" },
     { name = "alembic" },
@@ -1495,7 +1495,7 @@ dependencies = [
 requires-dist = [
     { name = "boto3", specifier = ">=1.42.40" },
     { name = "kubernetes", specifier = ">=35,<37" },
-    { name = "mlflow", git = "https://github.com/opendatahub-io/mlflow.git?rev=master" },
+    { name = "mlflow", git = "https://github.com/opendatahub-io/mlflow.git?rev=49763d36349b23b7a74dfa24f24d26009b8c30a5" },
     { name = "packaging", specifier = ">=25.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
     { name = "pydantic", specifier = ">=2.0.0" },
