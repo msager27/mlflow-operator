@@ -19,7 +19,7 @@ from .actions import (
 )
 from .base import TestBase
 from .constants.config import Config
-from .shared import TestData, TestStep, UserInfo
+from .shared import ActiveSkill, TestData, TestStep, UserInfo
 from .validations import (
     validate_authentication_denied,
     validate_authentication_denied_or_resource_not_found,
@@ -51,7 +51,7 @@ SEARCH_SKILL_NAME = f"search-skill-{uuid.uuid4().hex[:12]}"
 
 def _seed_skill_name(name: str):
     def action(test_context):
-        test_context.active_skill_name = name
+        test_context.active_skill = ActiveSkill(name=name)
 
     action.__name__ = f"seed_skill_name_{name}"
     return action

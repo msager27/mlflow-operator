@@ -12,7 +12,7 @@ from .validation_utils import (
 def validate_skill_created(test_context: TestContext) -> None:
     validate_resource_retrieved_or_created(
         test_context=test_context,
-        resource_field="active_skill_name",
+        resource_field="active_skill",
         resource_type="Skill",
         operation="creation",
     )
@@ -21,7 +21,7 @@ def validate_skill_created(test_context: TestContext) -> None:
 def validate_skill_retrieved(test_context: TestContext) -> None:
     validate_resource_retrieved_or_created(
         test_context=test_context,
-        resource_field="active_skill_name",
+        resource_field="active_skill",
         resource_type="Skill",
         operation="retrieval",
     )
@@ -36,18 +36,24 @@ def validate_skill_updated(test_context: TestContext) -> None:
         )
 
     expected_description = "Updated Skill Registry E2E description"
-    if test_context.active_skill_description != expected_description:
+    actual_description = (
+        test_context.active_skill.description
+        if test_context.active_skill
+        else None
+    )
+    if actual_description != expected_description:
         raise AssertionError(
             "Skill update was not persisted: expected description "
             f"{expected_description!r}, got "
-            f"{test_context.active_skill_description!r}"
+            f"{actual_description!r}"
         )
 
 
 def validate_skill_deleted(test_context: TestContext) -> None:
     if test_context.last_error is None:
         raise AssertionError(
-            f"Skill {test_context.active_skill_name!r} was still retrievable after deletion"
+            f"Skill {test_context.active_skill.name if test_context.active_skill else None!r} "
+            "was still retrievable after deletion"
         )
 
     if test_context.last_error.error.code != ErrorCode.RESOURCE_NOT_FOUND:
@@ -69,9 +75,12 @@ def validate_skill_search_excludes_other_workspace(
     returned_names = {
         skill.name for skill in test_context.skill_search_results or []
     }
-    if test_context.active_skill_name in returned_names:
+    active_skill_name = (
+        test_context.active_skill.name if test_context.active_skill else None
+    )
+    if active_skill_name in returned_names:
         raise AssertionError(
-            f"Skill {test_context.active_skill_name!r} from another workspace "
+            f"Skill {active_skill_name!r} from another workspace "
             "was returned by search"
         )
 
@@ -87,9 +96,12 @@ def validate_skill_search_includes_active_skill(
     returned_names = {
         skill.name for skill in test_context.skill_search_results or []
     }
-    if test_context.active_skill_name not in returned_names:
+    active_skill_name = (
+        test_context.active_skill.name if test_context.active_skill else None
+    )
+    if active_skill_name not in returned_names:
         raise AssertionError(
-            f"Skill {test_context.active_skill_name!r} was not returned by search"
+            f"Skill {active_skill_name!r} was not returned by search"
         )
 
 
@@ -99,7 +111,7 @@ def validate_skill_artifact_registered(test_context: TestContext) -> None:
             f"Skill registration failed: {test_context.last_error.error.message}"
         )
 
-    source = test_context.active_skill_source
+    source = test_context.active_skill.source if test_context.active_skill else None
     artifact_uri = getattr(source, "artifact_path", None) or str(source or "")
     if not artifact_uri.startswith("mlflow-artifacts:/skills/"):
         raise AssertionError(
@@ -126,8 +138,17 @@ def validate_skill_artifact_registration_unavailable(
     try:
         versions = list(
             test_context.admin_client.search_skill_versions(
-                name=test_context.active_skill_name,
-                organization=test_context.active_skill_organization or "",
+                name=(
+                    test_context.active_skill.name
+                    if test_context.active_skill
+                    else ""
+                ),
+                organization=(
+                    test_context.active_skill.organization
+                    if test_context.active_skill
+                    else ""
+                )
+                or "",
             )
         )
     except MlflowException as error:
@@ -152,7 +173,11 @@ def validate_skill_artifact_read(test_context: TestContext) -> None:
         )
 
     if (
-        test_context.active_skill_artifact_content
+        (
+            test_context.active_skill.artifact_content
+            if test_context.active_skill
+            else None
+        )
         != test_context.expected_skill_artifact_content
     ):
         raise AssertionError("Downloaded Skill artifact content did not match")

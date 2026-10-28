@@ -10,6 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class ActiveSkill:
+    """Skill state shared between Skill Registry test actions and validators."""
+
+    name: Optional[str] = None
+    organization: Optional[str] = None
+    version: Optional[int] = None
+    source: Optional[Any] = None
+    description: Optional[str] = None
+    artifact_content: Optional[str] = None
+
+
+@dataclass
 class TestContext:
     """Context for tracking test resources and state with workspace awareness.
 
@@ -42,7 +54,7 @@ class TestContext:
         model: Created or loaded model object
         model_uri: URI of logged model
         active_trace: Retrieved MLflow trace object
-        active_skill_description: Skill description returned by the last retrieval
+        active_skill: Currently active Skill state
         artifact_location: Artifact storage URI from run info
         expected_artifact_bucket: Expected S3 bucket name for custom artifact location
         expected_artifact_path: Expected relative path within bucket for custom artifacts
@@ -63,12 +75,7 @@ class TestContext:
     active_mcp_server_name: Optional[str] = None
     mcp_servers_to_delete: dict[str, str] = field(default_factory=dict)
     active_mcp_server_version: Optional[str] = None
-    active_skill_name: Optional[str] = None
-    active_skill_organization: Optional[str] = None
-    active_skill_version: Optional[int] = None
-    active_skill_source: Optional[Any] = None
-    active_skill_description: Optional[str] = None
-    active_skill_artifact_content: Optional[str] = None
+    active_skill: Optional[ActiveSkill] = None
     expected_skill_artifact_content: Optional[str] = None
     skills_to_delete: dict[tuple[str, str], str] = field(default_factory=dict)
     skill_search_results: Optional[list[Any]] = None
