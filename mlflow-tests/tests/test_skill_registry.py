@@ -58,6 +58,7 @@ def _seed_skill_name(name: str):
 
 
 @pytest.mark.SkillRegistry
+@pytest.mark.smoke
 class TestSkillRegistry(TestBase):
     test_scenarios: ClassVar[list[TestData]] = [
         TestData(
