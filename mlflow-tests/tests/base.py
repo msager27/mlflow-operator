@@ -331,14 +331,16 @@ class TestBase:
                         else:
                             error_msg = (
                                 f"Failed to check Skill {skill_name} "
-                                f"in workspace {workspace}: {get_error}"
+                                f"in workspace {workspace} "
+                                f"(error_type={type(get_error).__name__})"
                             )
                             logger.warning(error_msg)
                             cleanup_errors.append(error_msg)
                 except Exception as e:
                     error_msg = (
                         f"Failed to delete Skill {skill_name} "
-                        f"in workspace {workspace}: {e}"
+                        f"in workspace {workspace} "
+                        f"(error_type={type(e).__name__})"
                     )
                     logger.warning(error_msg)
                     cleanup_errors.append(error_msg)
